@@ -88,7 +88,11 @@ echo "[chdman] built: $CHDMAN_BIN"
 file "$CHDMAN_BIN"
 
 echo "[chdman] packaging AppImage"
-APP_VERSION="$VER" "$REPO_DIR/build/package-appimage.sh" \
+# NOTE: invoked via `bash`, NOT as ./script — files uploaded through GitHub's
+# web editor are stored mode 0644 (non-executable), and direct execution dies
+# with exit 126 "Permission denied". Same applies to every other cross-script
+# call in these repos: never rely on the executable bit.
+APP_VERSION="$VER" bash "$REPO_DIR/build/package-appimage.sh" \
   chdman "$CHDMAN_BIN" \
   "MAME Compressed Hunks of Data (CHD) manager" \
   "https://www.mamedev.org" \
