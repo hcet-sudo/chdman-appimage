@@ -69,6 +69,7 @@ if [ ! -x "$CHDMAN_BIN" ]; then
   exit 1
 fi
 echo "[chdman] built: $CHDMAN_BIN"
+strip "$CHDMAN_BIN"
 file "$CHDMAN_BIN"
 
 echo "[chdman] packaging AppImage"
