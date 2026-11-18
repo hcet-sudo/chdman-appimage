@@ -60,17 +60,31 @@ install -m 644 "$APPDIR/$NAME.desktop" \
 
 cat > "$APPDIR/usr/share/metainfo/$NAME.appdata.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="console-application">
-  <id>$METAINFO_ID</id>
-  <name>$NAME</name>
-  <summary>$SUMMARY</summary>
-  <metadata_license>MIT</metadata_license>
+<component type="desktop-application">
+  <id>io.github.chdman-appimage.chdman</id>
+  <name>chdman</name>
+  <summary>Compressed disc image tool from MAME</summary>
+  <metadata_license>FSFAP</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
-  <developer_name>Unofficial AppImage build (chdman-unecm-appimage)</developer_name>
-  <url type="homepage">$HOMEPAGE</url>
-  <provides>
-    <binary>$NAME</binary>
-  </provides>
+  <developer>
+    <name>chdman-appimage</name>
+  </developer>
+  <description>
+    <p>
+      chdman is the CHD disc image manager from the MAME project. It converts raw
+      CD and DVD images such as cue/bin into MAME's compact CHD format, and converts
+      CHD files back again.
+    </p>
+    <p>
+      CHD files use lossless compression, typically shrinking a full CD image to a
+      fraction of its original size while remaining bit-perfect when converted back.
+    </p>
+  </description>
+  <launchable type="desktop-id">chdman.desktop</launchable>
+  <content_rating type="oars-1.1"/>
+  <releases>
+    <release version="0.289"/>
+  </releases>
 </component>
 EOF
 
