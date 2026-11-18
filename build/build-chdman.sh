@@ -52,6 +52,22 @@ int SDL_SetClipboardText(const char *text) { (void)text; return -1; }
 EOF
 gcc -c -O2 -fPIE -o "$STUBDIR/sdl-clipboard-stubs.o" "$STUBDIR/sdl-clipboard-stubs.c"
 
+# Force baseline x86-64 (SSE2, no AVX/FMA/BMI2): GitHub's ubuntu-latest image
+# now defaults to the amd64v3 variant, whose gcc compiles with -march=x86-64-v3
+# — the resulting binary dies with SIGILL on older CPUs. Appending these flags
+# LAST makes them win over any distro default. The SIMD kernels in zstd/LZMA
+# use #pragma GCC target and are runtime-dispatched, so they stay safe.
+SHIMDIR="$DIST/cc-shim"
+mkdir -p "$SHIMDIR"
+for c in gcc g++ cc c++; do
+  if command -v "$c" >/dev/null 2>&1; then
+    printf '#!/bin/sh\nexec %s "$@" -march=x86-64 -mtune=generic\n' \
+      "$(command -v "$c")" > "$SHIMDIR/$c"
+    chmod +x "$SHIMDIR/$c"
+  fi
+done
+export PATH="$SHIMDIR:$PATH"
+
 echo "[chdman] generating projects (tools-only, no emulator/bgfx/Qt/midi)"
 rm -rf "$SRCDIR/build/projects"
 make -j"$(nproc)" $MAKEFLAGS LDOPTS="-static $STUBDIR/sdl-clipboard-stubs.o" generate
@@ -69,11 +85,10 @@ if [ ! -x "$CHDMAN_BIN" ]; then
   exit 1
 fi
 echo "[chdman] built: $CHDMAN_BIN"
-strip "$CHDMAN_BIN"
 file "$CHDMAN_BIN"
 
 echo "[chdman] packaging AppImage"
-"$REPO_DIR/build/package-appimage.sh" \
+APP_VERSION="$VER" "$REPO_DIR/build/package-appimage.sh" \
   chdman "$CHDMAN_BIN" \
   "MAME Compressed Hunks of Data (CHD) manager" \
   "https://www.mamedev.org" \
