@@ -52,7 +52,6 @@ GenericName=$SUMMARY
 Exec=$NAME
 Icon=$NAME
 Terminal=true
-NoDisplay=true
 Categories=Utility;ConsoleOnly;
 EOF
 install -m 644 "$APPDIR/$NAME.desktop" \

@@ -11,7 +11,12 @@ T="$(mktemp -d)"
 trap 'rm -rf "$T"' EXIT
 cd "$T"
 
-run() { APPIMAGE_EXTRACT_AND_RUN=1 "$CHDMAN_APP" "$@"; }
+# EMU_PREFIX (optional): command prefix for every invocation, e.g.
+#   EMU_PREFIX="qemu-x86_64-static -cpu qemu64"  -> run on an emulated
+# baseline x86-64-v1 CPU; the test then fails if the binary contains any
+# instruction a v1 CPU rejects (SIGILL). Pass the extracted inner binary as
+# $1 when using this (nested execs would otherwise escape the emulator).
+run() { APPIMAGE_EXTRACT_AND_RUN=1 ${EMU_PREFIX:-} "$CHDMAN_APP" "$@"; }
 
 echo "--- banner ---"
 run 2>&1 | head -1 || true
