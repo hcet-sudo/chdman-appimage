@@ -30,9 +30,6 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Make build scripts executable
-        run: chmod +x build/*.sh
-
       - name: Install build dependencies
         run: sudo apt-get update && sudo apt-get install -y libsdl2-dev libfontconfig1-dev
 
@@ -104,7 +101,7 @@ jobs:
           \`\`\`
 
           Note: chdman cannot read \`.ecm\` files — decode those first with
-          [unecm](https://github.com/USER/unecm-appimage/releases/latest).
+          [unecm](https://github.com/${{ github.repository_owner }}/unecm-appimage/releases/latest).
 
           Built and functionally self-tested in CI on every release
           (bit-perfect CD-image roundtrip). See SHA256SUMS.txt for checksums.
