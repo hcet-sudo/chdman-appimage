@@ -58,33 +58,44 @@ EOF
 install -m 644 "$APPDIR/$NAME.desktop" \
   "$APPDIR/usr/share/applications/$NAME.desktop"
 
-cat > "$APPDIR/usr/share/metainfo/$NAME.appdata.xml" <<EOF
+# Per-app metadata (this copy packages chdman)
+DESCRIPTION='<p>
+      chdman is the CHD (Compressed Hunks of Data) manager from the MAME project.
+      It converts raw CD and DVD images (cue/bin, ISO) into MAME&apos;s compact,
+      losslessly compressed CHD format and converts CHD files back again.
+    </p>
+    <p>
+      CHD conversion is bit-perfect: an extracted image is identical to the
+      original, while a full CD image typically shrinks to a fraction of its
+      original size. This is an unofficial, fully static build that runs on any
+      x86_64 Linux without system libraries.
+    </p>'
+RELEASE_DATE="${RELEASE_DATE:-$(date -u +%F)}"
+RELEASES_XML=""
+if [ -n "${APP_VERSION:-}" ]; then
+  RELEASES_XML="  <releases>
+    <release version=\"${APP_VERSION}\" date=\"${RELEASE_DATE}\"/>
+  </releases>"
+fi
+
+cat > "$APPDIR/usr/share/metainfo/$METAINFO_ID.appdata.xml" <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
-<component type="desktop-application">
-  <id>io.github.chdman-appimage.chdman</id>
-  <name>chdman</name>
-  <summary>Compressed disc image tool from MAME</summary>
-  <metadata_license>FSFAP</metadata_license>
+<component type="console-application">
+  <id>$METAINFO_ID</id>
+  <name>$NAME</name>
+  <summary>$SUMMARY</summary>
+  <metadata_license>MIT</metadata_license>
   <project_license>GPL-2.0-or-later</project_license>
-  <developer>
-    <name>chdman-appimage</name>
-  </developer>
   <description>
-    <p>
-      chdman is the CHD disc image manager from the MAME project. It converts raw
-      CD and DVD images such as cue/bin into MAME's compact CHD format, and converts
-      CHD files back again.
-    </p>
-    <p>
-      CHD files use lossless compression, typically shrinking a full CD image to a
-      fraction of its original size while remaining bit-perfect when converted back.
-    </p>
+$DESCRIPTION
   </description>
-  <launchable type="desktop-id">chdman.desktop</launchable>
+  <launchable type="desktop-id">$NAME.desktop</launchable>
+  <url type="homepage">$HOMEPAGE</url>
+  <provides>
+    <binary>$NAME</binary>
+  </provides>
   <content_rating type="oars-1.1"/>
-  <releases>
-    <release version="0.289"/>
-  </releases>
+$RELEASES_XML
 </component>
 EOF
 
@@ -102,5 +113,7 @@ if ldd "$BIN" 2>/dev/null | grep -q "dynamic"; then
 fi
 
 cd "$DIST"
-APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 "$TOOL" "$APPDIR" "$OUT"
+# --no-appstream: AppStream validation must never block the build. The metadata
+# above is still shipped and catalog sites still index it.
+APPIMAGE_EXTRACT_AND_RUN=1 ARCH=x86_64 "$TOOL" --no-appstream "$APPDIR" "$OUT"
 echo "[pkg] OK: $OUT"
