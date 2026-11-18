@@ -42,7 +42,17 @@ jobs:
         run: |
           TAG="${{ inputs.mame_tag }}"
           if [ -z "$TAG" ]; then
-            TAG="$(curl -fsSL https://api.github.com/repos/mamedev/mame/releases/latest | jq -r .tag_name)"
+            # Authenticate: unauthenticated api.github.com calls from shared
+            # runner IPs hit the 60 req/hr rate limit (403 -> empty tag ->
+            # a confusing 404 two steps later). github.token = 5000 req/hr.
+            TAG="$(curl -fsSL \
+              -H "Authorization: Bearer ${{ github.token }}" \
+              -H "Accept: application/vnd.github+json" \
+              https://api.github.com/repos/mamedev/mame/releases/latest | jq -r .tag_name)"
+          fi
+          if [ -z "$TAG" ]; then
+            echo "::error::could not resolve latest MAME tag (API rate limit or outage?)"
+            exit 1
           fi
           echo "tag=$TAG" >> "$GITHUB_OUTPUT"
           # mame0289 -> 0.289 (MAME release tags are always mame0xxx)
