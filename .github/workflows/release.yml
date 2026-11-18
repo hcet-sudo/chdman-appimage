@@ -58,7 +58,7 @@ jobs:
       - name: Baseline-ISA gate (x86-64-v1 via qemu)
         run: |
           sudo apt-get update -qq && sudo apt-get install -y -qq qemu-user-static >/dev/null
-          ./chdman-x86_64.AppImage --appimage-extract >/dev/null
+          ./dist/chdman-x86_64.AppImage --appimage-extract >/dev/null
           # The extracted inner binary runs under an emulated baseline v1 CPU:
           # any v2+ instruction (from our code OR prebuilt static glibc) dies
           # with SIGILL and blocks the release.
