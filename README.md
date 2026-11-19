@@ -1,6 +1,6 @@
 # chdman — unofficial static AppImage
 
-[![Build and release](https://github.com/USER/chdman-appimage/actions/workflows/release.yml/badge.svg)](https://github.com/USER/chdman-appimage/actions/workflows/release.yml)
+[![Build and release](https://github.com/hcet-sudo/chdman-appimage/actions/workflows/release.yml/badge.svg)](https://github.com/hcet-sudo/chdman-appimage/actions/workflows/release.yml)
 
 Unofficial, **fully static** AppImage of MAME's `chdman` (Compressed Hunks of
 Data manager) for x86_64 Linux. Static means no glibc or library requirements
@@ -9,7 +9,7 @@ minimal containers and distros without FUSE.
 
 Built automatically from the latest [MAME](https://github.com/mamedev/mame)
 release every week. Companion repo:
-[unecm-appimage](https://github.com/USER/unecm-appimage) (decodes `.ecm`
+[unecm-appimage](https://github.com/hcet-sudo/unecm-appimage) (decodes `.ecm`
 files — chdman cannot read them).
 
 ## Install
@@ -17,13 +17,13 @@ files — chdman cannot read them).
 ### With am / appman
 
 ```
-am -e https://github.com/USER/chdman-appimage chdman chdman
+am -e https://github.com/hcet-sudo/chdman-appimage chdman chdman
 ```
 
 ### Direct download (stable URL)
 
 ```
-curl -LO https://github.com/USER/chdman-appimage/releases/latest/download/chdman-x86_64.AppImage
+curl -LO https://github.com/hcet-sudo/chdman-appimage/releases/latest/download/chdman-x86_64.AppImage
 chmod +x chdman-x86_64.AppImage
 ```
 
@@ -40,7 +40,7 @@ Without FUSE, run `./chdman-x86_64.AppImage --appimage-extract-and-run ...`.
 ```
 
 Have a `.bin.ecm`? That is ECM format, not CHD — decode it first with
-[unecm](https://github.com/USER/unecm-appimage), then use the cue sheet
+[unecm](https://github.com/hcet-sudo/unecm-appimage), then use the cue sheet
 above (a minimal one for MODE1/2352 images):
 
 ```
@@ -59,7 +59,12 @@ Monday and on demand, then:
 3. **Self-tests it** — generates a valid MODE1/2352 CD image, converts it
    with `createcd`, extracts it back with `extractcd`, and requires
    bit-identical results, plus `verify` and `info` on the CHD.
-4. Publishes a release tagged `<ver>@<date>_<epoch>` (e.g.
+4. **ISA-gates it** — the release only publishes if the same bit-perfect
+   self-test also passes under `qemu` emulating a **baseline x86-64-v1**
+   CPU. Any v2+ instruction (from our code or from prebuilt static glibc)
+   dies with SIGILL there and blocks the release — so the AppImage runs on
+   every x86_64 CPU, however old.
+5. Publishes a release tagged `<ver>@<date>_<epoch>` (e.g.
    `0.289@2026-11-17_1763...`) with the stable asset name
    `chdman-x86_64.AppImage`, so `releases/latest/download/...` always points
    at the newest build.
@@ -83,8 +88,8 @@ dependencies.
 
 ## Publishing your fork
 
-1. Replace `USER` with your GitHub username in this README:
-   `grep -rl USER . | xargs sed -i 's/USER/yourname/g'`.
+1. Replace `hcet-sudo` with your GitHub username in this README:
+   `grep -rl hcet-sudo . | xargs sed -i 's/hcet-sudo/yourname/g'`.
 2. Push the repo to GitHub (terminal or the web UI's "Upload files" flow —
    the workflows invoke scripts via `bash`, so missing execute bits on
    web-uploaded files don't matter).

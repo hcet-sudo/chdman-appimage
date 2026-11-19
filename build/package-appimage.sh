@@ -98,10 +98,16 @@ $RELEASES_XML
 </component>
 EOF
 
+# AppRun execs via a PATH-searched bare name: PATH-searched exec passes
+# argv[0] as the typed name, so the program's own usage text prints
+# "chdman ..." instead of the /tmp/.mount_... extraction path. POSIX sh —
+# works in dash/bash/busybox. No `cd`: the user's relative input/output
+# paths must keep working.
 cat > "$APPDIR/AppRun" <<EOF
 #!/bin/sh
 HERE=\$(dirname "\$(readlink -f "\$0")")
-exec "\$HERE/usr/bin/$NAME" "\$@"
+PATH="\$HERE/usr/bin:\$PATH"
+exec "$NAME" "\$@"
 EOF
 chmod 755 "$APPDIR/AppRun"
 
